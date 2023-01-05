@@ -1,0 +1,56 @@
+version: '3.5'
+services:
+  hitch:
+    image: hitch
+    container_name: "rev_varnish_php_hitch"
+    volumes:
+      - ./docker/hitch/hitch.conf:/etc/hitch/hitch.conf
+      - ./devcerts:/etc/hitch/certs/
+    ports:
+      - "443:443"
+    depends_on:
+      - varnish
+  varnish:
+    image: varnish:stable
+    container_name: "rev_varnish_php_varnish"
+    volumes:
+      - "./docker/varnish/default.vcl:/etc/varnish/default.vcl"
+    ports:
+      - "80:80"
+    depends_on:
+      - nginx_server
+  nginx_server_php:
+    container_name: "nginx_server_php"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html:cached
+  nginx_server:
+    container_name: "nginx_server"
+    image: nginx:latest
+    volumes:
+      - './docker/nginx_server/conf.d:/etc/nginx/conf.d'
+      - ./devcerts:/etc/nginx/certs
+      - .:/var/www/html:cached
+    ports:
+      - 81:80
+    depends_on:
+      - nginx_server_php
+      - mysql
+  mysql:
+    container_name: "nginx_server_mysql"
+    image: mysql:5
+    volumes:
+      - './docker/logs/mysql:/var/log/mysql'
+      - './docker/mysql:/etc/mysql/conf.d'
+      - './docker/mysql/init:/docker-entrypoint-initdb.d/:ro'
+    command: --max_allowed_packet=64M
+    environment:
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "${CONTAINER_DB_PORT}:3306"
