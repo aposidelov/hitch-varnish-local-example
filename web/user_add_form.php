@@ -18,7 +18,7 @@ if (isset($_POST['name']) && isset($_POST['pass'])) {
 
   $output=null;
   $retval=null;
-  exec('curl -I -X PURGE http://varnish', $output, $retval);
+  exec('curl -I -X PURGE http://my.varnish.test', $output, $retval);
   echo "Returned with status $retval and output:\n";
   echo '<pre>'.print_r($output, TRUE).'</pre>';
 }

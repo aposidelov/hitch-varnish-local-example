@@ -10,6 +10,8 @@ services:
       - "443:443"
     depends_on:
       - varnish
+    networks:
+      - mynet
   varnish:
     image: varnish:stable
     container_name: "rev_varnish_php_varnish"
@@ -19,6 +21,10 @@ services:
       - "80:80"
     depends_on:
       - nginx_server
+    networks:
+      mynet:
+        aliases:
+          - my.varnish.test
   nginx_server_php:
     container_name: "nginx_server_php"
     build:
@@ -26,6 +32,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/var/www/html:cached
+    networks:
+      - mynet
   nginx_server:
     container_name: "nginx_server"
     image: nginx:latest
@@ -38,6 +46,8 @@ services:
     depends_on:
       - nginx_server_php
       - mysql
+    networks:
+      - mynet
   mysql:
     container_name: "nginx_server_mysql"
     image: mysql:5
@@ -58,3 +68,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "${CONTAINER_DB_PORT}:3306"
+    networks:
+      - mynet
+networks:
+  mynet:
