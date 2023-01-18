@@ -18,8 +18,9 @@ if (isset($_POST['name']) && isset($_POST['pass'])) {
 
   $output=null;
   $retval=null;
-  exec('curl -I -X PURGE http://nginx_server', $output, $retval);
+  exec('curl -I -X PURGE http://varnish', $output, $retval);
   echo "Returned with status $retval and output:\n";
+  echo '<pre>'.print_r($output, TRUE).'</pre>';
 }
 
 include_once "page-top.php";

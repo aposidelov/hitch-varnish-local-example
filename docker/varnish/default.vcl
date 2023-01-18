@@ -6,14 +6,14 @@ backend default {
 }
 
 sub vcl_recv {
-  if (req.method != "GET" && req.method != "HEAD") {
-    return (pass);
-  }
   if (req.method == "PURGE") {
     if (!client.ip ~ purge) {
       return (synth(405, client.ip + " is not allowed to send PURGE requests."));
     }
     return (purge);
+  }
+  if (req.method != "GET" && req.method != "HEAD") {
+    return (pass);
   }
 
  if ( ( req.url ~ "/node/.+/edit") ||
@@ -38,11 +38,12 @@ sub vcl_deliver {
   } else {
     set resp.http.X-Cache = "MISS";
   }
-  set resp.http.X-Test = "Hello4";
+  set resp.http.X-Test = "Hello5";
 }
 
 acl purge {
   "localhost";
   "127.0.0.1";
   "::1";
+  "nginx_server_php";
 }
