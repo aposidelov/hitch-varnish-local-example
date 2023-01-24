@@ -6,10 +6,12 @@
     `brew install mkcert`
     `cd devcerts`
     `mkcert -install`
+    
+    `mkcert -key-file key.pem -cert-file cert.pem my.varnish.test`
    
 3) Combine generated files into one .pem file and put it into ./devcerts/ folder.
 
-    `cat cert.pem cert.key > combined-cert.pem`
+    `cat cert.pem key.pem > combined-cert.pem`
 
 4) `docker-compose up -d`
 
